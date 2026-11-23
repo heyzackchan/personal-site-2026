@@ -1,0 +1,16 @@
+---
+import Shell from '../layouts/Shell.astro';
+---
+<Shell title="About">
+  <article class="about">
+    <h1>About</h1>
+    <p>I am a designer working across art direction, interaction design and visual design. I help teams find a clear idea, then carry it from a logo all the way to a live website.</p>
+    <p>Replace this text with your story, your clients and how to reach you: <a href="mailto:hello@example.com">hello@example.com</a></p>
+  </article>
+</Shell>
+
+<style>
+  .about { padding: 120px clamp(16px, 5vw, 72px) 64px; max-width: 680px; }
+  h1 { font-size: clamp(40px, 4.5vw, 64px); text-transform: uppercase; margin: 0 0 24px; }
+  p { font-size: 19px; }
+</style>

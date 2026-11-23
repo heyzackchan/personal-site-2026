@@ -1,0 +1,48 @@
+---
+import Shell from '../layouts/Shell.astro';
+---
+<Shell title="Home">
+  <section class="stage">
+    <div class="glow" aria-hidden="true"></div>
+    <h1>Content<br />goes<br />here</h1>
+  </section>
+</Shell>
+
+<style>
+  .stage {
+    position: relative;
+    min-height: 100%;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    padding: 48px 16px;
+  }
+  .glow {
+    position: absolute;
+    width: 26vw;
+    aspect-ratio: 0.68;
+    border-radius: 50%;
+    transform: rotate(24deg);
+    background: radial-gradient(closest-side, rgb(242 120 236 / 0.28) 72%, rgb(240 110 232 / 1) 86%, transparent 100%);
+    filter: blur(1.4vw);
+    animation: drift 12s ease-in-out infinite alternate;
+  }
+  @keyframes drift {
+    to { transform: rotate(34deg) scale(1.05); }
+  }
+  h1 {
+    position: relative;
+    margin: 0;
+    font-size: 3.3vw;
+    font-weight: 900;
+    line-height: 1.22;
+    text-transform: uppercase;
+    text-align: center;
+    letter-spacing: 0;
+  }
+  @media (max-width: 820px) {
+    .stage { min-height: 70vh; }
+    .glow { width: 52vw; filter: blur(14px); }
+    h1 { font-size: 34px; }
+  }
+</style>

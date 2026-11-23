@@ -1,0 +1,38 @@
+---
+// Dot-matrix lettering, drawn as rounded squares. Used for the vertical name on the left edge.
+interface Props { text: string; dot?: number; vertical?: boolean; class?: string }
+const { text, dot = 9, vertical = false, class: className } = Astro.props;
+
+// 5x5 glyphs, one string per row. "#" = dot.
+const F: Record<string, string[]> = {
+  A: ['.###.', '#...#', '#####', '#...#', '#...#'], B: ['####.', '#...#', '####.', '#...#', '####.'],
+  C: ['.####', '#....', '#....', '#....', '.####'], D: ['####.', '#...#', '#...#', '#...#', '####.'],
+  E: ['#####', '#....', '####.', '#....', '#####'], F: ['#####', '#....', '####.', '#....', '#....'],
+  G: ['.####', '#....', '#..##', '#...#', '.###.'], H: ['#...#', '#...#', '#####', '#...#', '#...#'],
+  I: ['#####', '..#..', '..#..', '..#..', '#####'], J: ['..###', '...#.', '...#.', '#..#.', '.##..'],
+  K: ['#...#', '#..#.', '###..', '#..#.', '#...#'], L: ['#....', '#....', '#....', '#....', '#####'],
+  M: ['#...#', '##.##', '#.#.#', '#...#', '#...#'], N: ['#...#', '##..#', '#.#.#', '#..##', '#...#'],
+  O: ['.###.', '#...#', '#...#', '#...#', '.###.'], P: ['####.', '#...#', '####.', '#....', '#....'],
+  Q: ['.###.', '#...#', '#.#.#', '#..#.', '.##.#'], R: ['####.', '#...#', '####.', '#..#.', '#...#'],
+  S: ['.####', '#....', '.###.', '....#', '####.'], T: ['#####', '..#..', '..#..', '..#..', '..#..'],
+  U: ['#...#', '#...#', '#...#', '#...#', '.###.'], V: ['#...#', '#...#', '#...#', '.#.#.', '..#..'],
+  W: ['#...#', '#...#', '#.#.#', '##.##', '#...#'], X: ['#...#', '.#.#.', '..#..', '.#.#.', '#...#'],
+  Y: ['#...#', '.#.#.', '..#..', '..#..', '..#..'], Z: ['#####', '...#.', '..#..', '.#...', '#####'],
+  ' ': ['.....', '.....', '.....', '.....', '.....'],
+};
+const step = dot * 1.3;
+const chars = [...text.toUpperCase()].map((c) => F[c] ?? F[' ']);
+const length = chars.length * 6 * step;
+// Vertical text is turned 90° anticlockwise, so it reads bottom to top.
+const width = vertical ? 5 * step : length;
+const height = vertical ? length : 5 * step;
+const dots: { x: number; y: number }[] = [];
+chars.forEach((g, i) => g.forEach((row, y) => [...row].forEach((v, x) => {
+  if (v !== '#') return;
+  const px = (i * 6 + x) * step, py = y * step;
+  dots.push(vertical ? { x: py, y: length - px - dot } : { x: px, y: py });
+})));
+---
+<svg class={className} viewBox={`0 0 ${width} ${height}`} width={width} height={height} aria-hidden="true" fill="currentColor">
+  {dots.map((d) => <rect x={d.x} y={d.y} width={dot} height={dot} rx={dot * 0.3} />)}
+</svg>
