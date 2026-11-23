@@ -15,6 +15,17 @@ Then open http://localhost:4321.
 
 - `npm run build` makes the finished site in the `dist/` folder.
 - `npm run check` looks for type errors.
+- `npm run format` tidies the code formatting with Prettier.
+
+## Edit visually with Stacki
+
+[Stacki](https://github.com/flowtricks/stacki) is a free visual editor for Astro. It edits these same files.
+
+1. Install the desktop app (Mac, Windows or Linux) from stacki.build.
+2. Open this project folder in it. It runs `npm run dev` for the live preview.
+3. Lumos's ready-made components appear in its Components panel, and `.stacki/` holds the settings for them. The Lumos stylesheets are locked, so Stacki can't change them by accident.
+
+Stacki edits a page visually only when the page is a layout wrapping a list of components. Pages with their own HTML, such as the home page, open in its code editor instead.
 
 ## Add a case study
 
@@ -45,21 +56,24 @@ Our own components use BEM class names, for example `tile-grid`, `tile-grid__til
 
 ## Where things live
 
-| File | What it does |
+This follows the folder layout of a fresh `npm create astro@latest` project, plus the extra folders Lumos adds.
+
+| File or folder | What it does |
 | --- | --- |
+| `src/pages/` | One file per page. `index.astro` is the home page, `about.astro` is /about, and `work/[id].astro` is the template for every case study. |
 | `src/layouts/SplitLayout.astro` | The split-screen frame around every page, and the colour bars in the top right. |
-| `src/components/LeftPanel.astro` | The left half: edge stripes, dotted name, pills, tiles and tagline. |
-| `src/components/FilterPills.astro` | The Interactions, Studies and Clients buttons. |
-| `src/components/TileGrid.astro` | The 3 by 3 tile grid, and the outline on the tile for the current page. |
-| `src/components/DotText.astro` | Draws text out of dots. Change the name in `LeftPanel.astro`. |
-| `src/pages/index.astro` | The home page with the pink glow. |
-| `src/pages/about.astro` | The about page. |
-| `src/pages/work/[id].astro` | The template used for every case study page. |
+| `src/components/global/` | Pieces that appear on every page. Ours are `LeftPanel`, `FilterPills`, `TileGrid` and `DotText`. Lumos's `Nav`, `Footer` and `SkipLink` live here too. |
+| `src/components/` (other folders) | Lumos's ready-made components, such as `Section`, `Heading` and `Img`. |
+| `src/content/case-studies/` | Your case studies, one folder each. |
 | `src/content.config.ts` | The list of fields each case study must have. |
-| `src/utilities/case-studies.ts` | Loads the case studies to show, in grid order. |
-| `src/consts.ts` | Site name, description and web address. |
 | `src/styles/` | Lumos styles and our colour tokens. |
-| `src/components/` (subfolders) | Lumos's ready-made components. |
+| `src/utils/` | Small helpers. `case-studies.ts` loads the case studies in grid order. The others come with Lumos. |
+| `src/assets/` | Fonts and icons that Astro optimises. |
+| `src/consts.ts` | Site name, description and web address. |
+| `public/` | Files served exactly as they are: the favicon and the image used when the site is shared. |
+| `.stacki/` | Settings for the Stacki visual editor. |
+| `.agents/skills/` | Lumos's helper guides for AI assistants, such as upgrading Lumos. `.claude/skills/` links to them. |
+| `.vscode/` | Recommended VS Code extension and settings. |
 | `LUMOS.md` | Lumos's guide to building pages and components. |
 | `scripts/make-sample-images.mjs` | Made the placeholder images. Delete it once you add real work. |
 
