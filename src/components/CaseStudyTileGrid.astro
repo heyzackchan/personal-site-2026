@@ -1,0 +1,177 @@
+---
+/*
+ * The 3 by 3 grid of tiles on the left side.
+ * Case studies fill the first tiles. Plain sage tiles fill the rest, so the grid always stays 3 by 3.
+ */
+import { Image } from 'astro:assets';
+import { getVisibleCaseStudies, getCaseStudyPageAddress } from '../utilities/case-studies';
+
+const totalTilesInGrid = 9;
+
+const caseStudies = await getVisibleCaseStudies();
+const numberOfEmptyTiles = Math.max(0, totalTilesInGrid - caseStudies.length);
+const emptyTiles = Array.from({ length: numberOfEmptyTiles });
+
+// Tells the browser how wide the tile image will be, so it downloads a suitably sized file.
+const tileImageDisplayWidths = '(max-width: 820px) 30vw, 210px';
+---
+<ul class="tile-grid" role="list">
+  {caseStudies.map((caseStudy) => (
+    <li class="tile-grid-cell" data-tile-category={caseStudy.data.category}>
+      <a
+        class="tile tile-with-case-study"
+        href={getCaseStudyPageAddress(caseStudy)}
+        style={`--tile-color: ${caseStudy.data.tileColor}`}
+        data-case-study-link
+      >
+        <Image
+          src={caseStudy.data.coverImage}
+          alt=""
+          widths={[240, 480]}
+          sizes={tileImageDisplayWidths}
+          loading="eager"
+        />
+        <span class="tile-title">{caseStudy.data.title}</span>
+      </a>
+    </li>
+  ))}
+
+  {emptyTiles.map(() => (
+    <li class="tile-grid-cell" aria-hidden="true">
+      <span class="tile tile-empty"></span>
+    </li>
+  ))}
+</ul>
+
+<script>
+  /*
+   * Outline the tile for the case study you are looking at.
+   * The grid stays on screen between pages, so we update the outline after every page change.
+   */
+  function addTrailingSlash(path: string): string {
+    if (path.endsWith('/')) {
+      return path;
+    }
+    return path + '/';
+  }
+
+  function outlineTileForCurrentPage() {
+    const currentPagePath = addTrailingSlash(window.location.pathname);
+    const allCaseStudyLinks = document.querySelectorAll<HTMLAnchorElement>('[data-case-study-link]');
+
+    allCaseStudyLinks.forEach((link) => {
+      const linkPath = addTrailingSlash(new URL(link.href).pathname);
+      const isCurrentPage = linkPath === currentPagePath;
+      if (isCurrentPage) {
+        // aria-current tells screen readers this is the page you are on. The CSS also uses it for the outline.
+        link.setAttribute('aria-current', 'page');
+      } else {
+        link.removeAttribute('aria-current');
+      }
+    });
+  }
+
+  document.addEventListener('astro:page-load', outlineTileForCurrentPage);
+</script>
+
+<style>
+  .tile-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 10.3vw);
+    justify-content: center;
+    gap: 0.9vw;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .tile-grid-cell {
+    aspect-ratio: 205 / 211;
+    transition: opacity 0.3s ease, filter 0.3s ease;
+  }
+
+  /* Added by FilterPills.astro when a different category is selected. */
+  .tile-grid-cell.is-filtered-out {
+    opacity: 0.25;
+    filter: grayscale(1);
+  }
+
+  .tile {
+    position: relative;
+    display: block;
+    height: 100%;
+    overflow: hidden;
+    border: 1.5px solid var(--color-tile-border);
+    border-radius: 1.3vw;
+    background: var(--color-tile);
+    box-shadow: inset 0 0 1.1vw var(--color-tile-inner-glow);
+    text-decoration: none;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+
+  .tile-with-case-study {
+    background: var(--tile-color);
+  }
+
+  .tile-with-case-study :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* A soft shadow on the inside edge, so image tiles match the empty sage tiles. */
+  .tile-with-case-study::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    box-shadow: inset 0 0 22px rgb(0 0 0 / 0.18);
+    pointer-events: none;
+  }
+
+  .tile-with-case-study:hover {
+    transform: translateY(-3px);
+  }
+
+  .tile-with-case-study[aria-current='page'] {
+    box-shadow:
+      0 0 0 3px var(--color-page-background),
+      0 0 0 5px var(--color-text);
+  }
+
+  /* The project name. Hidden until you hover the tile, or while you are on that project's page. */
+  .tile-title {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 28px 14px 12px;
+    background: linear-gradient(transparent, rgb(0 0 0 / 0.55));
+    color: white;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+
+  .tile-with-case-study:hover .tile-title,
+  .tile-with-case-study:focus-visible .tile-title,
+  .tile-with-case-study[aria-current='page'] .tile-title {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (max-width: 820px) {
+    .tile-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .tile {
+      border-radius: 16px;
+    }
+  }
+</style>

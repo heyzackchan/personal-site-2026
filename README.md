@@ -1,6 +1,6 @@
 # Portfolio
 
-Plain Astro (no React). The screen is split in half. The left side holds filter pills, a 3x3 tile grid and the tagline, and it stays put while project pages change on the right, using Astro view transitions.
+A plain Astro site (no React). The screen is split in half. The left half holds the filter pills, a 3 by 3 tile grid and the tagline. It stays on screen while the right half changes from page to page, using Astro view transitions.
 
 ## Run it
 
@@ -9,32 +9,39 @@ npm install
 npm run dev
 ```
 
-Then open http://localhost:4321. Use `npm run build` to make the static site in `dist/`.
+Then open http://localhost:4321. Use `npm run build` to make the finished site in the `dist/` folder.
 
 ## Add a case study
 
-1. Make a folder in `src/content/work/`, for example `src/content/work/acme-rebrand/`.
+1. Make a folder in `src/content/case-studies/`, for example `src/content/case-studies/acme-rebrand/`. The folder name becomes the page address: `/work/acme-rebrand/`.
 2. Put your images in that folder.
-3. Add an `index.md` with this front matter (copy one of the samples):
+3. Add an `index.md` file. Copy the top section (the "front matter" between the `---` lines) from one of the samples and fill it in:
    - `title`, `client`, `year`, `summary`, `disciplines`
-   - `category`: `interactions`, `studies` or `clients` (sets which pill highlights it)
-   - `cover` and `coverAlt` (the cover is also the menu tile)
-   - `accent` (tile background colour), `order` (lower comes first)
-   - `gallery`: a list of `src`, `alt` and optional `caption`
-   - `draft: true` hides it from the built site
-4. Write the story below the front matter in Markdown.
+   - `category`: `interactions`, `studies` or `clients`. This decides which filter pill highlights it.
+   - `coverImage` and `coverImageDescription`. The cover is used on the tile and at the top of the page.
+   - `tileColor`: the tile's background colour while the image loads.
+   - `sortOrder`: lower numbers come first in the grid.
+   - `gallery`: a list of extra images, each with `image`, `description` and an optional `caption`.
+   - `isDraft: true` hides it from the published site, but still shows it while you run it locally.
+4. Write the story below the front matter, in Markdown.
 
-Images are resized and converted to WebP automatically at build time.
+Images are resized and converted to WebP automatically when the site is built.
 
 ## Where things live
 
-- `src/layouts/Shell.astro` the 50/50 shell and the colour bars. `transition:persist` keeps the left side alive between pages.
-- `src/components/Panel.astro` the pills, the tile grid (empty slots fill it to 9), the stripes and the tagline.
-- `src/components/DotType.astro` the dot-matrix lettering on the left edge. Change the `text` in Panel.astro.
-- `src/pages/index.astro` the right side home view with the pink glow.
-- `src/pages/work/[id].astro` the case study template.
-- `src/content.config.ts` the case study fields.
-- `src/styles/global.css` colour tokens and fonts.
-- `scripts/make-samples.mjs` made the placeholder images. Delete it once you add real work.
+| File | What it does |
+| --- | --- |
+| `src/layouts/Shell.astro` | The split-screen frame around every page, and the colour bars in the top right. |
+| `src/components/LeftPanel.astro` | The left half: edge stripes, dotted name, pills, tiles and tagline. |
+| `src/components/FilterPills.astro` | The Interactions, Studies and Clients buttons, and the code that fades tiles. |
+| `src/components/CaseStudyTileGrid.astro` | The 3 by 3 tile grid, and the outline on the tile for the current page. |
+| `src/components/DotMatrixText.astro` | Draws text out of dots. Change the name in `LeftPanel.astro`. |
+| `src/pages/index.astro` | The home page with the pink glow. |
+| `src/pages/about.astro` | The about page. |
+| `src/pages/work/[caseStudyId].astro` | The template used for every case study page. |
+| `src/content.config.ts` | The list of fields each case study must have. |
+| `src/utilities/case-studies.ts` | Shared helpers for loading case studies in the right order. |
+| `src/styles/global.css` | Colours, fonts and other site-wide styles. |
+| `scripts/make-sample-images.mjs` | Made the placeholder images. Delete it once you add real work. |
 
-Search for "Your Name", `hello@example.com` and `example.com` to swap in your details.
+Search for "Your Name", `hello@example.com` and `example.com` to swap in your own details.

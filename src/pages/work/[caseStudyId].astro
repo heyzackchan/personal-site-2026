@@ -1,0 +1,178 @@
+---
+/*
+ * The template for every case study page.
+ * The [caseStudyId] in the file name means Astro makes one page per case study,
+ * at the address /work/<folder-name>/
+ */
+import { Image } from 'astro:assets';
+import { render } from 'astro:content';
+import Shell from '../../layouts/Shell.astro';
+import { getVisibleCaseStudies, type CaseStudy } from '../../utilities/case-studies';
+
+// Astro calls this once while building, to learn which pages to make.
+export async function getStaticPaths() {
+  const caseStudies = await getVisibleCaseStudies();
+
+  return caseStudies.map((caseStudy) => {
+    return {
+      params: { caseStudyId: caseStudy.id },
+      props: { caseStudy },
+    };
+  });
+}
+
+interface Props {
+  caseStudy: CaseStudy;
+}
+
+const { caseStudy } = Astro.props;
+const caseStudyDetails = caseStudy.data;
+
+// `render` turns the Markdown story below the front matter into something we can place on the page.
+const { Content: CaseStudyStory } = await render(caseStudy);
+
+// Tells the browser how wide the images will be, so it downloads a suitably sized file.
+const largeImageDisplayWidths = '(max-width: 820px) 100vw, 50vw';
+const largeImageSizesToGenerate = [800, 1200, 1600];
+---
+<Shell pageTitle={caseStudyDetails.title} pageDescription={caseStudyDetails.summary}>
+  <article class="case-study">
+    <header class="case-study-header">
+      <h1 class="case-study-title">{caseStudyDetails.title}</h1>
+      <p class="case-study-summary">{caseStudyDetails.summary}</p>
+
+      <dl class="case-study-facts">
+        <div class="case-study-fact">
+          <dt>Client</dt>
+          <dd>{caseStudyDetails.client}</dd>
+        </div>
+        <div class="case-study-fact">
+          <dt>Year</dt>
+          <dd>{caseStudyDetails.year}</dd>
+        </div>
+        <div class="case-study-fact">
+          <dt>Work</dt>
+          <dd>{caseStudyDetails.disciplines.join(', ')}</dd>
+        </div>
+      </dl>
+    </header>
+
+    <Image
+      class="case-study-image"
+      src={caseStudyDetails.coverImage}
+      alt={caseStudyDetails.coverImageDescription}
+      widths={largeImageSizesToGenerate}
+      sizes={largeImageDisplayWidths}
+      loading="eager"
+    />
+
+    <div class="case-study-story">
+      <CaseStudyStory />
+    </div>
+
+    {caseStudyDetails.gallery.length > 0 && (
+      <section class="case-study-gallery" aria-label="Project images">
+        {caseStudyDetails.gallery.map((galleryItem) => (
+          <figure class="gallery-item">
+            <Image
+              class="case-study-image"
+              src={galleryItem.image}
+              alt={galleryItem.description}
+              widths={largeImageSizesToGenerate}
+              sizes={largeImageDisplayWidths}
+            />
+            {galleryItem.caption && (
+              <figcaption class="gallery-caption">{galleryItem.caption}</figcaption>
+            )}
+          </figure>
+        ))}
+      </section>
+    )}
+  </article>
+</Shell>
+
+<style>
+  .case-study {
+    /* The space on the left and right of everything on this page. */
+    --side-spacing: clamp(16px, 4vw, 64px);
+    padding-bottom: 96px;
+  }
+
+  .case-study-header {
+    max-width: 820px;
+    padding: 120px var(--side-spacing) 32px;
+  }
+
+  .case-study-title {
+    margin: 0 0 18px;
+    font-size: clamp(40px, 4.5vw, 66px);
+    font-weight: 900;
+    text-transform: uppercase;
+  }
+
+  .case-study-summary {
+    max-width: 640px;
+    margin: 0 0 28px;
+    color: var(--color-text-secondary);
+    font-size: 21px;
+    line-height: 1.45;
+  }
+
+  .case-study-facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 40px;
+    margin: 0;
+    font-size: 15px;
+  }
+
+  .case-study-fact dt {
+    color: var(--color-text-secondary);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .case-study-fact dd {
+    margin: 2px 0 0;
+  }
+
+  .case-study :global(.case-study-image) {
+    width: calc(100% - 2 * var(--side-spacing));
+    margin: 0 var(--side-spacing);
+    border-radius: var(--corner-radius-large);
+  }
+
+  .case-study-story {
+    max-width: 720px;
+    padding: 48px var(--side-spacing) 16px;
+  }
+
+  /* :global is needed because these headings and paragraphs come from the Markdown file. */
+  .case-study-story :global(h2) {
+    margin: 40px 0 8px;
+    font-size: 22px;
+    letter-spacing: 0;
+    text-transform: uppercase;
+  }
+
+  .case-study-story :global(p) {
+    margin: 0 0 16px;
+  }
+
+  .case-study-gallery {
+    display: grid;
+    gap: 40px;
+    margin-top: 32px;
+  }
+
+  .gallery-item {
+    margin: 0;
+  }
+
+  .gallery-caption {
+    padding: 10px var(--side-spacing) 0;
+    color: var(--color-text-secondary);
+    font-size: 15px;
+  }
+</style>

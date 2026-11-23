@@ -1,0 +1,136 @@
+---
+/*
+ * The row of pill buttons above the tile grid: Interactions, Studies, Clients.
+ * Clicking a pill switches it on and fades out tiles from other categories.
+ * Clicking the same pill again switches it off and shows everything.
+ */
+import { caseStudyCategories } from '../content.config';
+
+function capitalizeFirstLetter(word: string): string {
+  return word.charAt(0).toUpperCase() + word.slice(1);
+}
+---
+<div class="filter-pills" role="group" aria-label="Filter case studies">
+  {caseStudyCategories.map((category) => (
+    <button type="button" class="filter-pill" data-category={category} aria-pressed="false">
+      <span class="filter-pill-knob" aria-hidden="true"></span>
+      {capitalizeFirstLetter(category)}
+    </button>
+  ))}
+</div>
+
+<script>
+  /*
+   * This whole left side stays on screen when you move between pages (see Shell.astro),
+   * so the chosen category is remembered as you click through case studies.
+   */
+  let selectedCategory: string | null = null;
+
+  function showSelectedCategory() {
+    const allPills = document.querySelectorAll<HTMLButtonElement>('.filter-pill');
+    allPills.forEach((pill) => {
+      const isSelected = pill.dataset.category === selectedCategory;
+      // aria-pressed tells screen readers the pill is switched on. The CSS also uses it for the "on" look.
+      pill.setAttribute('aria-pressed', String(isSelected));
+    });
+
+    const allTiles = document.querySelectorAll<HTMLElement>('[data-tile-category]');
+    allTiles.forEach((tile) => {
+      const isAnyCategorySelected = selectedCategory !== null;
+      const isInSelectedCategory = tile.dataset.tileCategory === selectedCategory;
+      const shouldFadeOut = isAnyCategorySelected && !isInSelectedCategory;
+      tile.classList.toggle('is-filtered-out', shouldFadeOut);
+    });
+  }
+
+  function handlePillClick(clickedPill: HTMLButtonElement) {
+    const clickedCategory = clickedPill.dataset.category ?? null;
+    const isAlreadySelected = clickedCategory === selectedCategory;
+    if (isAlreadySelected) {
+      selectedCategory = null;
+    } else {
+      selectedCategory = clickedCategory;
+    }
+    showSelectedCategory();
+  }
+
+  function setUpPills() {
+    const allPills = document.querySelectorAll<HTMLButtonElement>('.filter-pill');
+    allPills.forEach((pill) => {
+      // This runs after every page change, so skip pills we already set up.
+      const isAlreadySetUp = pill.dataset.isSetUp === 'true';
+      if (isAlreadySetUp) {
+        return;
+      }
+      pill.dataset.isSetUp = 'true';
+      pill.addEventListener('click', () => handlePillClick(pill));
+    });
+    showSelectedCategory();
+  }
+
+  // Astro fires "astro:page-load" on the first visit and after every page change.
+  document.addEventListener('astro:page-load', setUpPills);
+</script>
+
+<style>
+  .filter-pills {
+    display: flex;
+    justify-content: center;
+    gap: 0.7vw;
+  }
+
+  .filter-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5em 0.75em;
+    border: 1.5px solid var(--color-pill-border);
+    border-radius: 999px;
+    background: var(--color-pill-background);
+    color: var(--color-text);
+    font-family: var(--font-body);
+    font-size: clamp(10px, 1vw, 16px);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.25s ease, padding 0.25s ease;
+  }
+
+  /* The little white circle. It is hidden (zero width) until the pill is switched on. */
+  .filter-pill-knob {
+    width: 0;
+    height: 1.25em;
+    margin-left: -0.6em;
+    border-radius: 50%;
+    background: white;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.15);
+    transition: width 0.25s ease;
+  }
+
+  /* Switched on: a darker track appears behind the knob, like a toggle switch. */
+  .filter-pill[aria-pressed='true'] {
+    padding-left: 0.55em;
+    background: linear-gradient(
+      to right,
+      var(--color-pill-switched-on) 0 2.85em,
+      var(--color-pill-background) 2.85em
+    );
+  }
+
+  .filter-pill[aria-pressed='true'] .filter-pill-knob {
+    width: 1.25em;
+    margin-left: 0;
+    margin-right: 0.9em;
+  }
+
+  @media (max-width: 820px) {
+    .filter-pills {
+      gap: 8px;
+    }
+
+    .filter-pill {
+      font-size: 12px;
+    }
+  }
+</style>

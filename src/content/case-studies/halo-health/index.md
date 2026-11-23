@@ -5,16 +5,16 @@ year: 2025
 summary: A calm web experience for a health tracking app, built around one glanceable daily ring.
 category: interactions
 disciplines: [Web experience, Product design, Design system]
-cover: ./cover.jpg
-coverAlt: Three concentric mint rings on deep navy with the halo wordmark.
-accent: "#0f1a3d"
-order: 2
+coverImage: ./cover.jpg
+coverImageDescription: Three concentric mint rings on deep navy with the halo wordmark.
+tileColor: "#0f1a3d"
+sortOrder: 2
 gallery:
-  - src: ./dashboard.jpg
-    alt: Web dashboard with a navy sidebar, coloured progress bars and a trend line.
+  - image: ./dashboard.jpg
+    description: Web dashboard with a navy sidebar, coloured progress bars and a trend line.
     caption: The dashboard shows today first and trends second.
-  - src: ./mobile.jpg
-    alt: Three phone screens on a periwinkle background.
+  - image: ./mobile.jpg
+    description: Three phone screens on a periwinkle background.
     caption: Mobile screens share the same components as the web app.
 ---
 
