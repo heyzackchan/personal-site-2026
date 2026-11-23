@@ -1,0 +1,133 @@
+---
+/*
+ * The row of pill buttons above the tile grid: Interactions, Studies, Clients.
+ * Clicking a pill switches it on and fades out tiles from other categories.
+ * Clicking the same pill again switches it off and shows everything.
+ */
+import { categories } from "@/content.config";
+
+function capitalize(word: string): string {
+  return word.charAt(0).toUpperCase() + word.slice(1);
+}
+---
+<div class="filter-pills" role="group" aria-label="Filter case studies">
+  {categories.map((category) => (
+    <button type="button" class="filter-pills__pill" data-category={category} aria-pressed="false">
+      <span class="filter-pills__knob" aria-hidden="true"></span>
+      {capitalize(category)}
+    </button>
+  ))}
+</div>
+
+<script>
+  /*
+   * JavaScript only keeps track of which pill is on. Every bit of movement
+   * (the knob sliding in, tiles fading) is a CSS transition below and in TileGrid.astro.
+   *
+   * The left panel stays on screen between pages, so `active` is remembered
+   * as you click through case studies.
+   */
+  let active: string | null = null;
+
+  function update() {
+    document.querySelectorAll<HTMLButtonElement>(".filter-pills__pill").forEach((pill) => {
+      const isOn = pill.dataset.category === active;
+      // aria-pressed tells screen readers the pill is switched on. The CSS uses it for the "on" look.
+      pill.setAttribute("aria-pressed", String(isOn));
+    });
+
+    document.querySelectorAll<HTMLElement>(".tile-grid__cell[data-category]").forEach((cell) => {
+      const isFiltering = active !== null;
+      const isMatch = cell.dataset.category === active;
+      cell.classList.toggle("tile-grid__cell--faded", isFiltering && !isMatch);
+    });
+  }
+
+  function toggle(pill: HTMLButtonElement) {
+    const category = pill.dataset.category ?? null;
+    if (category === active) {
+      active = null;
+    } else {
+      active = category;
+    }
+    update();
+  }
+
+  function setUp() {
+    document.querySelectorAll<HTMLButtonElement>(".filter-pills__pill").forEach((pill) => {
+      // This runs after every page change, so skip pills that already listen for clicks.
+      if (pill.dataset.ready) {
+        return;
+      }
+      pill.dataset.ready = "true";
+      pill.addEventListener("click", () => toggle(pill));
+    });
+    update();
+  }
+
+  // Astro fires "astro:page-load" on the first visit and after every page change.
+  document.addEventListener("astro:page-load", setUp);
+</script>
+
+<style is:global>
+  @layer components {
+    .filter-pills {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+
+      @media (width >= 48rem) {
+        gap: 1.4cqw;
+      }
+    }
+
+    .filter-pills__pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.5em 0.75em;
+      border: 0.09375rem solid var(--slate-200);
+      border-radius: var(--radius-round);
+      background-color: var(--paper-100);
+      color: var(--text);
+      font-size: 0.75rem;
+      font-weight: var(--primary-medium);
+      line-height: var(--line-height-small);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      transition:
+        background var(--hover-duration) var(--hover-ease),
+        padding var(--hover-duration) var(--hover-ease);
+
+      @media (width >= 48rem) {
+        font-size: clamp(0.625rem, 2cqw, 1rem);
+      }
+    }
+
+    /* The little white circle. It has no width until the pill is switched on. */
+    .filter-pills__knob {
+      width: 0;
+      height: 1.25em;
+      margin-left: -0.6em;
+      border-radius: 50%;
+      background-color: var(--light-100);
+      box-shadow: 0 0.0625rem 0.125rem rgb(0 0 0 / 0.15);
+      transition: width var(--hover-duration) var(--hover-ease);
+    }
+
+    /* Switched on: a darker track appears behind the knob, like a toggle switch. */
+    .filter-pills__pill[aria-pressed="true"] {
+      padding-left: 0.55em;
+      background: linear-gradient(
+        to right,
+        var(--slate-300) 0 2.85em,
+        var(--paper-100) 2.85em
+      );
+
+      .filter-pills__knob {
+        width: 1.25em;
+        margin-left: 0;
+        margin-right: 0.9em;
+      }
+    }
+  }
+</style>

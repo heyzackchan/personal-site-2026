@@ -1,61 +1,82 @@
 ---
-import { Image } from 'astro:assets';
-import { getCollection, render } from 'astro:content';
-import Shell from '../../layouts/Shell.astro';
+/*
+ * The template for every case study page.
+ * The [id] in the file name means Astro makes one page per case study,
+ * at the address /work/<folder-name>/
+ */
+import { render } from "astro:content";
+import SplitLayout from "@/layouts/SplitLayout.astro";
+import Section from "@/components/wrapper/Section.astro";
+import Heading from "@/components/typography/Heading.astro";
+import Paragraph from "@/components/typography/Paragraph.astro";
+import RichText from "@/components/typography/RichText.astro";
+import Img from "@/components/media/Img.astro";
+import { getCaseStudies, type CaseStudy } from "@/utils/case-studies.ts";
 
+// Astro calls this while building, to learn which pages to make.
 export async function getStaticPaths() {
-  const work = await getCollection('work', ({ data }) => import.meta.env.DEV || !data.draft);
-  return work.map((entry) => ({ params: { id: entry.id }, props: { entry } }));
+  const caseStudies = await getCaseStudies();
+  return caseStudies.map((caseStudy) => ({
+    params: { id: caseStudy.id },
+    props: { caseStudy },
+  }));
 }
 
-const { entry } = Astro.props;
-const { Content } = await render(entry);
-const d = entry.data;
+interface Props {
+  caseStudy: CaseStudy;
+}
+
+const { caseStudy } = Astro.props;
+const project = caseStudy.data;
+
+// `render` turns the Markdown story under the front matter into something we can place on the page.
+const { Content: Story } = await render(caseStudy);
+
+// Images fill the right half on tablets and up, and the full width on phones.
+const imageSizes = "(width >= 48rem) 50vw, 100vw";
+
+const facts = [
+  { label: "Client", value: project.client },
+  { label: "Year", value: project.year },
+  { label: "Work", value: project.disciplines.join(", ") },
+];
 ---
-<Shell title={d.title} description={d.summary}>
-  <article>
-    <header class="head">
-      <h1>{d.title}</h1>
-      <p class="summary">{d.summary}</p>
-      <dl class="meta">
-        <div><dt>Client</dt><dd>{d.client}</dd></div>
-        <div><dt>Year</dt><dd>{d.year}</dd></div>
-        <div><dt>Work</dt><dd>{d.disciplines.join(', ')}</dd></div>
-      </dl>
-    </header>
-
-    <Image class="hero" src={d.cover} alt={d.coverAlt} widths={[800, 1200, 1600]} sizes="(max-width: 820px) 100vw, 70vw" loading="eager" />
-
-    <div class="body">
-      <Content />
+<SplitLayout title={project.title} description={project.summary}>
+  <Section paddingTop="large" gap="6">
+    <div>
+      <Heading tag="h1" variant="h2" class="text-transform-uppercase weight-bold">{project.title}</Heading>
+      <Paragraph variant="large" maxWidth={45} class="color-faded">{project.summary}</Paragraph>
     </div>
 
-    {d.gallery.length > 0 && (
-      <section class="gallery" aria-label="Project images">
-        {d.gallery.map((g) => (
-          <figure>
-            <Image src={g.src} alt={g.alt} widths={[800, 1200, 1600]} sizes="(max-width: 820px) 100vw, 70vw" />
-            {g.caption && <figcaption>{g.caption}</figcaption>}
-          </figure>
-        ))}
-      </section>
-    )}
-  </article>
-</Shell>
+    <dl class="flex-horizontal-wrap gap-6 gap-row-3">
+      {facts.map((fact) => (
+        <div>
+          <dt class="text-style-small text-transform-uppercase color-faded">{fact.label}</dt>
+          <dd>{fact.value}</dd>
+        </div>
+      ))}
+    </dl>
 
-<style>
-  article { --pad: clamp(16px, 4vw, 64px); padding-bottom: 96px; }
-  .head { padding: 120px var(--pad) 32px; max-width: 820px; }
-  h1 { font-size: clamp(40px, 4.5vw, 66px); font-weight: 900; text-transform: uppercase; margin: 0 0 18px; }
-  .summary { font-size: 21px; color: var(--muted); margin: 0 0 28px; max-width: 640px; line-height: 1.45; }
-  .meta { display: flex; flex-wrap: wrap; gap: 12px 40px; margin: 0; font-size: 15px; }
-  dt { color: var(--muted); font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; }
-  dd { margin: 2px 0 0; }
-  .hero, .gallery :global(img) { width: calc(100% - 2 * var(--pad)); margin: 0 var(--pad); border-radius: var(--radius); }
-  .body { padding: 48px var(--pad) 16px; max-width: 720px; }
-  .body :global(h2) { font-size: 22px; text-transform: uppercase; letter-spacing: 0; margin: 40px 0 8px; }
-  .body :global(p) { margin: 0 0 16px; }
-  .gallery { display: grid; gap: 40px; margin-top: 32px; }
-  figure { margin: 0; }
-  figcaption { padding: 10px var(--pad) 0; color: var(--muted); font-size: 15px; }
-</style>
+    <Img
+      src={project.coverImage}
+      alt={project.coverAlt}
+      variant="constrained"
+      sizes={imageSizes}
+      loading="eager"
+      class="radius-main"
+    />
+
+    <RichText maxWidth={60}>
+      <Story />
+    </RichText>
+
+    {project.gallery.map((item) => (
+      <figure class="width-full">
+        <Img src={item.image} alt={item.alt} variant="constrained" sizes={imageSizes} class="radius-main" />
+        {item.caption && (
+          <figcaption class="text-style-small color-faded margin-top-2">{item.caption}</figcaption>
+        )}
+      </figure>
+    ))}
+  </Section>
+</SplitLayout>

@@ -1,0 +1,120 @@
+---
+/*
+ * Draws text out of small rounded squares, like an old dot-matrix display.
+ * Used for the name that runs up the left edge of the screen.
+ *
+ * Example:
+ *   <DotText text="Your Name" vertical />
+ */
+
+interface Props {
+  /** The words to draw. Letters A to Z and spaces. */
+  text: string;
+  /** Turn the text on its side so it reads from bottom to top. */
+  vertical?: boolean;
+}
+
+const { text, vertical = false } = Astro.props;
+
+/*
+ * Each letter is a 5 by 5 grid of dots, written as five rows.
+ * A "#" means "draw a dot here". A "." means "leave this spot empty".
+ */
+const letters: Record<string, string[]> = {
+  A: [".###.", "#...#", "#####", "#...#", "#...#"],
+  B: ["####.", "#...#", "####.", "#...#", "####."],
+  C: [".####", "#....", "#....", "#....", ".####"],
+  D: ["####.", "#...#", "#...#", "#...#", "####."],
+  E: ["#####", "#....", "####.", "#....", "#####"],
+  F: ["#####", "#....", "####.", "#....", "#...."],
+  G: [".####", "#....", "#..##", "#...#", ".###."],
+  H: ["#...#", "#...#", "#####", "#...#", "#...#"],
+  I: ["#####", "..#..", "..#..", "..#..", "#####"],
+  J: ["..###", "...#.", "...#.", "#..#.", ".##.."],
+  K: ["#...#", "#..#.", "###..", "#..#.", "#...#"],
+  L: ["#....", "#....", "#....", "#....", "#####"],
+  M: ["#...#", "##.##", "#.#.#", "#...#", "#...#"],
+  N: ["#...#", "##..#", "#.#.#", "#..##", "#...#"],
+  O: [".###.", "#...#", "#...#", "#...#", ".###."],
+  P: ["####.", "#...#", "####.", "#....", "#...."],
+  Q: [".###.", "#...#", "#.#.#", "#..#.", ".##.#"],
+  R: ["####.", "#...#", "####.", "#..#.", "#...#"],
+  S: [".####", "#....", ".###.", "....#", "####."],
+  T: ["#####", "..#..", "..#..", "..#..", "..#.."],
+  U: ["#...#", "#...#", "#...#", "#...#", ".###."],
+  V: ["#...#", "#...#", "#...#", ".#.#.", "..#.."],
+  W: ["#...#", "#...#", "#.#.#", "##.##", "#...#"],
+  X: ["#...#", ".#.#.", "..#..", ".#.#.", "#...#"],
+  Y: ["#...#", ".#.#.", "..#..", "..#..", "..#.."],
+  Z: ["#####", "...#.", "..#..", ".#...", "#####"],
+  " ": [".....", ".....", ".....", ".....", "....."],
+};
+
+// Sizes are in SVG units. The whole drawing scales with CSS, so these only set proportions.
+const dotSize = 9;
+const dotSpacing = dotSize * 1.3;
+// Each letter is 5 dots wide, plus 1 empty column before the next letter.
+const letterWidth = 6;
+
+const shapes = [...text.toUpperCase()].map((letter) => {
+  // Anything we have no shape for (numbers, punctuation) becomes a blank space.
+  return letters[letter] ?? letters[" "];
+});
+
+const textLength = shapes.length * letterWidth * dotSpacing;
+const textHeight = 5 * dotSpacing;
+
+let width = textLength;
+let height = textHeight;
+if (vertical) {
+  width = textHeight;
+  height = textLength;
+}
+
+// Work out where every dot goes.
+const dots: { x: number; y: number }[] = [];
+
+shapes.forEach((shape, letterIndex) => {
+  shape.forEach((row, rowIndex) => {
+    [...row].forEach((mark, columnIndex) => {
+      if (mark !== "#") {
+        return;
+      }
+
+      // Position as if the text were written normally, left to right.
+      const across = (letterIndex * letterWidth + columnIndex) * dotSpacing;
+      const down = rowIndex * dotSpacing;
+
+      if (vertical) {
+        // A quarter turn anticlockwise: "across" becomes "up", and "down" becomes "across".
+        dots.push({ x: down, y: textLength - across - dotSize });
+      } else {
+        dots.push({ x: across, y: down });
+      }
+    });
+  });
+});
+---
+<svg
+  class="dot-text"
+  viewBox={`0 0 ${width} ${height}`}
+  width={width}
+  height={height}
+  fill="currentColor"
+  aria-hidden="true"
+>
+  {dots.map((dot) => (
+    <rect x={dot.x} y={dot.y} width={dotSize} height={dotSize} rx={dotSize * 0.3} />
+  ))}
+</svg>
+
+<style is:global>
+  @layer components {
+    /* Fill the width of whatever holds it, and keep its proportions. */
+    .dot-text {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+  }
+</style>
