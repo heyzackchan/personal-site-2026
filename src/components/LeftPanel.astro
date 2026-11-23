@@ -1,124 +1,118 @@
 ---
 /*
  * Everything on the left half of the screen.
- * This panel stays on screen while you move between pages (see Shell.astro).
+ * This panel stays on screen while you move between pages (see SplitLayout.astro).
  */
-import DotMatrixText from './DotMatrixText.astro';
-import FilterPills from './FilterPills.astro';
-import CaseStudyTileGrid from './CaseStudyTileGrid.astro';
+import DotText from "@/components/DotText.astro";
+import FilterPills from "@/components/FilterPills.astro";
+import TileGrid from "@/components/TileGrid.astro";
 ---
 <div class="left-panel">
   <!-- Three coloured stripes down the far left edge. Purely decorative. -->
-  <div class="edge-stripes" aria-hidden="true">
-    <span class="edge-stripe edge-stripe-lavender"></span>
-    <span class="edge-stripe edge-stripe-blue"></span>
-    <span class="edge-stripe edge-stripe-green"></span>
+  <div class="left-panel__stripes" aria-hidden="true">
+    <span class="left-panel__stripe left-panel__stripe--lavender"></span>
+    <span class="left-panel__stripe left-panel__stripe--sky"></span>
+    <span class="left-panel__stripe left-panel__stripe--mint"></span>
   </div>
 
   <!-- The dotted name running up the left edge. It also links back to the home page. -->
-  <a class="vertical-name-link" href="/" aria-label="Home">
-    <DotMatrixText text="Your Name" isVertical class="vertical-name" />
+  <a class="left-panel__name" href="/" aria-label="Home">
+    <DotText text="Your Name" vertical />
   </a>
 
   <FilterPills />
 
-  <CaseStudyTileGrid />
+  <TileGrid />
 
-  <p class="tagline">
+  <p class="left-panel__tagline letter-spacing-tight">
     art direction,<br />
     interaction design,<br />
     visual design
   </p>
 </div>
 
-<style>
-  .left-panel {
-    position: relative;
-    display: grid;
-    /* Three rows: pills, tile grid, then the tagline pushed to the bottom. */
-    grid-template-rows: auto auto 1fr;
-    justify-items: center;
-    row-gap: 4vw;
-    height: 100%;
-    padding-top: 7vw;
-    padding-right: 4vw;
-    padding-left: 6vw;
-    overflow: hidden;
-  }
-
-  .edge-stripes {
-    position: absolute;
-    top: 42%;
-    bottom: 0;
-    left: 0;
-    display: flex;
-    flex-direction: column;
-    width: 1.25vw;
-  }
-
-  /* flex-grow sets how tall each stripe is compared to the others. */
-  .edge-stripe-lavender {
-    flex-grow: 46;
-    background: var(--color-stripe-lavender);
-  }
-
-  .edge-stripe-blue {
-    flex-grow: 15;
-    background: var(--color-stripe-blue);
-  }
-
-  .edge-stripe-green {
-    flex-grow: 15;
-    background: var(--color-stripe-green);
-  }
-
-  .vertical-name-link {
-    position: absolute;
-    bottom: 0.4vw;
-    left: 1.25vw;
-    color: var(--color-dotted-name);
-    text-decoration: none;
-  }
-
-  .vertical-name-link :global(.vertical-name) {
-    display: block;
-    width: 3.9vw;
-    height: auto;
-  }
-
-  .tagline {
-    align-self: end;
-    justify-self: start;
-    margin: 0;
-    margin-left: -0.6vw;
-    color: var(--color-tagline);
-    font-family: var(--font-body);
-    font-size: 2.05vw;
-    font-weight: 700;
-    line-height: 0.97;
-    letter-spacing: -0.045em;
-  }
-
-  /* Phones: tighter spacing, thinner stripes, and the dotted name is hidden to save room. */
-  @media (max-width: 820px) {
+<style is:global>
+  @layer components {
+    /*
+     * On tablets and up, the panel scales as one piece with the width of the window,
+     * like an artboard. Sizes inside use cqw: 1cqw is 1% of the left half's width
+     * (the left half is the container, see SplitLayout.astro).
+     */
     .left-panel {
-      row-gap: 24px;
-      padding: 56px 16px 24px 28px;
-      overflow: visible;
+      position: relative;
+      display: grid;
+      /* Three rows: pills, tile grid, then the tagline pushed to the bottom. */
+      grid-template-rows: auto auto 1fr;
+      justify-items: center;
+      row-gap: 1.5rem;
+      padding: 3.5rem 1rem 1.5rem 1.75rem;
+
+      @media (width >= 48rem) {
+        row-gap: 8cqw;
+        height: 100%;
+        padding: 14cqw 8cqw 0 12cqw;
+        overflow: hidden;
+      }
     }
 
-    .edge-stripes {
+    .left-panel__stripes {
+      position: absolute;
       top: 0;
-      width: 8px;
+      bottom: 0;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+      width: 0.5rem;
+
+      @media (width >= 48rem) {
+        top: 42%;
+        width: 2.5cqw;
+      }
     }
 
-    .vertical-name-link {
+    /* flex-grow sets how tall each stripe is compared to the others. */
+    .left-panel__stripe--lavender {
+      flex-grow: 46;
+      background-color: var(--lavender-200);
+    }
+
+    .left-panel__stripe--sky {
+      flex-grow: 15;
+      background-color: var(--sky-200);
+    }
+
+    .left-panel__stripe--mint {
+      flex-grow: 15;
+      background-color: var(--mint-200);
+    }
+
+    /* Hidden on phones to save room. */
+    .left-panel__name {
       display: none;
+      color: var(--grey-400);
+
+      @media (width >= 48rem) {
+        position: absolute;
+        bottom: 0.8cqw;
+        left: 2.5cqw;
+        display: block;
+        width: 7.8cqw;
+      }
     }
 
-    .tagline {
-      margin: 0;
-      font-size: 26px;
+    .left-panel__tagline {
+      align-self: end;
+      justify-self: start;
+      color: var(--grey-500);
+      font-size: 1.625rem;
+      font-weight: var(--primary-bold);
+      line-height: 0.97;
+      letter-spacing: -0.045em;
+
+      @media (width >= 48rem) {
+        margin-left: -1.2cqw;
+        font-size: 4.1cqw;
+      }
     }
   }
 </style>

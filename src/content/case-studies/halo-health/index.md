@@ -6,15 +6,15 @@ summary: A calm web experience for a health tracking app, built around one glanc
 category: interactions
 disciplines: [Web experience, Product design, Design system]
 coverImage: ./cover.jpg
-coverImageDescription: Three concentric mint rings on deep navy with the halo wordmark.
+coverAlt: Three concentric mint rings on deep navy with the halo wordmark.
 tileColor: "#0f1a3d"
-sortOrder: 2
+order: 2
 gallery:
   - image: ./dashboard.jpg
-    description: Web dashboard with a navy sidebar, coloured progress bars and a trend line.
+    alt: Web dashboard with a navy sidebar, coloured progress bars and a trend line.
     caption: The dashboard shows today first and trends second.
   - image: ./mobile.jpg
-    description: Three phone screens on a periwinkle background.
+    alt: Three phone screens on a periwinkle background.
     caption: Mobile screens share the same components as the web app.
 ---
 

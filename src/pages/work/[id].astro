@@ -1,0 +1,82 @@
+---
+/*
+ * The template for every case study page.
+ * The [id] in the file name means Astro makes one page per case study,
+ * at the address /work/<folder-name>/
+ */
+import { render } from "astro:content";
+import SplitLayout from "@/layouts/SplitLayout.astro";
+import Section from "@/components/wrapper/Section.astro";
+import Heading from "@/components/typography/Heading.astro";
+import Paragraph from "@/components/typography/Paragraph.astro";
+import RichText from "@/components/typography/RichText.astro";
+import Img from "@/components/media/Img.astro";
+import { getCaseStudies, type CaseStudy } from "@/utilities/case-studies";
+
+// Astro calls this while building, to learn which pages to make.
+export async function getStaticPaths() {
+  const caseStudies = await getCaseStudies();
+  return caseStudies.map((caseStudy) => ({
+    params: { id: caseStudy.id },
+    props: { caseStudy },
+  }));
+}
+
+interface Props {
+  caseStudy: CaseStudy;
+}
+
+const { caseStudy } = Astro.props;
+const project = caseStudy.data;
+
+// `render` turns the Markdown story under the front matter into something we can place on the page.
+const { Content: Story } = await render(caseStudy);
+
+// Images fill the right half on tablets and up, and the full width on phones.
+const imageSizes = "(width >= 48rem) 50vw, 100vw";
+
+const facts = [
+  { label: "Client", value: project.client },
+  { label: "Year", value: project.year },
+  { label: "Work", value: project.disciplines.join(", ") },
+];
+---
+<SplitLayout title={project.title} description={project.summary}>
+  <Section paddingTop="large" gap="6">
+    <div>
+      <Heading tag="h1" variant="h2" class="text-transform-uppercase weight-bold">{project.title}</Heading>
+      <Paragraph variant="large" maxWidth={45} class="color-faded">{project.summary}</Paragraph>
+    </div>
+
+    <dl class="flex-horizontal-wrap gap-6 gap-row-3">
+      {facts.map((fact) => (
+        <div>
+          <dt class="text-style-small text-transform-uppercase color-faded">{fact.label}</dt>
+          <dd>{fact.value}</dd>
+        </div>
+      ))}
+    </dl>
+
+    <Img
+      src={project.coverImage}
+      alt={project.coverAlt}
+      variant="constrained"
+      sizes={imageSizes}
+      loading="eager"
+      class="radius-main"
+    />
+
+    <RichText maxWidth={60}>
+      <Story />
+    </RichText>
+
+    {project.gallery.map((item) => (
+      <figure class="width-full">
+        <Img src={item.image} alt={item.alt} variant="constrained" sizes={imageSizes} class="radius-main" />
+        {item.caption && (
+          <figcaption class="text-style-small color-faded margin-top-2">{item.caption}</figcaption>
+        )}
+      </figure>
+    ))}
+  </Section>
+</SplitLayout>

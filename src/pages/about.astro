@@ -2,37 +2,23 @@
 /*
  * The about page. Replace the text with your own.
  */
-import Shell from '../layouts/Shell.astro';
+import SplitLayout from "@/layouts/SplitLayout.astro";
+import Section from "@/components/wrapper/Section.astro";
+import Heading from "@/components/typography/Heading.astro";
+import Paragraph from "@/components/typography/Paragraph.astro";
 
-const contactEmailAddress = 'hello@example.com';
+const email = "hello@example.com";
 ---
-<Shell pageTitle="About">
-  <article class="about-page">
-    <h1 class="about-heading">About</h1>
-    <p>
+<SplitLayout title="About">
+  <Section paddingTop="large" gap="4">
+    <Heading tag="h1" variant="h2" class="text-transform-uppercase weight-bold">About</Heading>
+    <Paragraph variant="large" maxWidth={60}>
       I am a designer working across art direction, interaction design and visual design.
       I help teams find a clear idea, then carry it from a logo all the way to a live website.
-    </p>
-    <p>
+    </Paragraph>
+    <Paragraph variant="large" maxWidth={60}>
       Replace this text with your story, your clients and how to reach you:
-      <a href={`mailto:${contactEmailAddress}`}>{contactEmailAddress}</a>
-    </p>
-  </article>
-</Shell>
-
-<style>
-  .about-page {
-    max-width: 680px;
-    padding: 120px clamp(16px, 5vw, 72px) 64px;
-  }
-
-  .about-heading {
-    margin: 0 0 24px;
-    font-size: clamp(40px, 4.5vw, 64px);
-    text-transform: uppercase;
-  }
-
-  .about-page p {
-    font-size: 19px;
-  }
-</style>
+      <a href={`mailto:${email}`}>{email}</a>
+    </Paragraph>
+  </Section>
+</SplitLayout>

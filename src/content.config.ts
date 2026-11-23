@@ -1,16 +1,14 @@
 /*
  * Content collections tell Astro what shape our content has.
  * If a case study is missing a field, or a field has the wrong type,
- * the site will refuse to build and tell you exactly what is wrong.
+ * the site refuses to build and says exactly what is wrong.
  */
-import { defineCollection } from 'astro:content';
-import { glob } from 'astro/loaders';
-import { z } from 'astro/zod';
+import { defineCollection } from "astro:content";
+import { glob } from "astro/loaders";
+import { z } from "astro/zod";
 
-// The three filter pills on the left side. Every case study belongs to one of these.
-export const caseStudyCategories = ['interactions', 'studies', 'clients'] as const;
-
-const caseStudiesFolder = './src/content/case-studies';
+/** The three filter pills on the left. Every case study belongs to one of these. */
+export const categories = ["interactions", "studies", "clients"] as const;
 
 /*
  * Each case study lives in its own folder:
@@ -20,53 +18,51 @@ const caseStudiesFolder = './src/content/case-studies';
  */
 const caseStudies = defineCollection({
   loader: glob({
-    pattern: '*/index.md',
-    base: caseStudiesFolder,
-    generateId: ({ entry: pathToMarkdownFile }) => {
-      const folderName = pathToMarkdownFile.split('/')[0];
-      return folderName;
-    },
+    pattern: "*/index.md",
+    base: "./src/content/case-studies",
+    // Use the folder name, not the file name, as each case study's id.
+    generateId: ({ entry }) => entry.split("/")[0],
   }),
 
-  // `image` is a helper from Astro. It checks the image file exists and prepares it for optimisation.
+  // `image` checks the image file exists and prepares it for optimisation.
   schema: ({ image }) =>
     z.object({
       title: z.string(),
       client: z.string(),
       year: z.number(),
 
-      // One or two sentences shown under the title, and used as the page description for search engines.
+      // One or two sentences under the title. Also used as the page description for search engines.
       summary: z.string(),
 
-      // The kinds of work done on the project, for example "Brand identity" or "Packaging".
+      // The kinds of work on the project, for example "Brand identity" or "Packaging".
       disciplines: z.array(z.string()),
 
       // Which filter pill this case study belongs to.
-      category: z.enum(caseStudyCategories),
+      category: z.enum(categories),
 
-      // The cover image is shown on the tile and at the top of the case study page.
+      // Shown on the tile and at the top of the case study page.
       coverImage: image(),
-      coverImageDescription: z.string(),
+      coverAlt: z.string(),
 
-      // Background colour of the tile while the cover image loads. Any CSS colour works.
-      tileColor: z.string().default('#111111'),
+      // The tile's background colour while the cover image loads. Any CSS colour works.
+      tileColor: z.string().default("#111111"),
 
-      // Lower numbers appear first in the tile grid.
-      sortOrder: z.number().default(100),
+      // Lower numbers come first in the tile grid.
+      order: z.number().default(100),
 
       // Extra images shown below the story.
       gallery: z
         .array(
           z.object({
             image: image(),
-            description: z.string(),
+            alt: z.string(),
             caption: z.string().optional(),
           }),
         )
         .default([]),
 
-      // Drafts show up while you run the site locally, but are left out of the published site.
-      isDraft: z.boolean().default(false),
+      // Drafts show while you run the site locally, but are left out of the published site.
+      draft: z.boolean().default(false),
     }),
 });
 

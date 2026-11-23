@@ -6,15 +6,15 @@ summary: A warm, hand-set identity for a small-batch roaster moving from farmers
 category: clients
 disciplines: [Brand identity, Packaging, Signage]
 coverImage: ./cover.jpg
-coverImageDescription: Northfield wordmark under a circular mountain mark in cream on dark roast brown.
+coverAlt: Northfield wordmark under a circular mountain mark in cream on dark roast brown.
 tileColor: "#2b1d14"
-sortOrder: 1
+order: 1
 gallery:
   - image: ./palette.jpg
-    description: Five colour swatches from dark roast brown to sage green.
+    alt: Five colour swatches from dark roast brown to sage green.
     caption: A palette pulled straight from the roast curve.
   - image: ./packaging.jpg
-    description: Three coffee bags in brown, cream and caramel with the circle mark.
+    alt: Three coffee bags in brown, cream and caramel with the circle mark.
     caption: One mark, three roast levels.
 ---
 
