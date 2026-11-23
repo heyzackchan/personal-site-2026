@@ -1,68 +1,11 @@
 ---
 /*
  * The home page: what shows on the right when someone first visits.
- * For now it is a placeholder, a blurred pink ring with big text in the middle.
+ * The page is just components, so Stacki can edit it visually.
  */
 import SplitLayout from "@/layouts/SplitLayout.astro";
+import HeroHome from "@/components/content/HeroHome.astro";
 ---
 <SplitLayout>
-  <section class="home-hero">
-    <div class="home-hero__glow" aria-hidden="true"></div>
-    <h1 class="home-hero__heading">Content<br />goes<br />here</h1>
-  </section>
+  <HeroHome heading="Content goes here" />
 </SplitLayout>
-
-<style is:global>
-  @layer components {
-    .home-hero {
-      position: relative;
-      display: grid;
-      place-items: center;
-      min-height: 70svh;
-      padding: var(--space-8) var(--site-margin);
-      overflow: hidden;
-
-      @media (width >= 48rem) {
-        min-height: 100%;
-      }
-    }
-
-    /*
-     * The ring is an oval filled with a radial gradient:
-     * pale pink in the middle, strong pink near the edge, then fading out.
-     * The blur softens it, and the rotation tilts it like the reference.
-     * Sizes use cqw, a percentage of the right half's width.
-     */
-    .home-hero__glow {
-      position: absolute;
-      width: 52cqw;
-      aspect-ratio: 0.68;
-      border-radius: 50%;
-      background: radial-gradient(
-        closest-side,
-        rgb(242 120 236 / 0.28) 72%,
-        var(--pink-glow) 86%,
-        transparent 100%
-      );
-      filter: blur(2.8cqw);
-      transform: rotate(24deg);
-      animation: home-hero-tilt 12s ease-in-out infinite alternate;
-    }
-
-    .home-hero__heading {
-      position: relative;
-      font-size: clamp(2.125rem, 6.6cqw, 5rem);
-      font-weight: 900;
-      line-height: 1.22;
-      text-align: center;
-      text-transform: uppercase;
-    }
-
-    /* A slow, gentle sway. Turned off for people who ask for less motion (see base.css). */
-    @keyframes home-hero-tilt {
-      to {
-        transform: rotate(34deg) scale(1.05);
-      }
-    }
-  }
-</style>

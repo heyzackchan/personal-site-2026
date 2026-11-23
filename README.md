@@ -25,7 +25,7 @@ Then open http://localhost:4321.
 2. Open this project folder in it. It runs `npm run dev` for the live preview.
 3. Lumos's ready-made components appear in its Components panel, and `.stacki/` holds the settings for them. The Lumos stylesheets are locked, so Stacki can't change them by accident.
 
-Stacki edits a page visually only when the page is a layout wrapping a list of components. Pages with their own HTML, such as the home page, open in its code editor instead.
+Pages are built from components and plain HTML, with no styles of their own, so Stacki can show them as a tree you can click into. Styles live inside each component. The home page's text is the `heading` setting on `HeroHome`. The case study template's text comes from each case study's Markdown file, so change it there.
 
 ## Add a case study
 
@@ -62,6 +62,7 @@ This follows the folder layout of a fresh `npm create astro@latest` project, plu
 | --- | --- |
 | `src/pages/` | One file per page. `index.astro` is the home page, `about.astro` is /about, and `work/[id].astro` is the template for every case study. |
 | `src/layouts/SplitLayout.astro` | The split-screen frame around every page, and the colour bars in the top right. |
+| `src/components/content/` | Content blocks for a single page. `HeroHome` is the pink glow block on the home page. |
 | `src/components/global/` | Pieces that appear on every page. Ours are `LeftPanel`, `FilterPills`, `TileGrid` and `DotText`. Lumos's `Nav`, `Footer` and `SkipLink` live here too. |
 | `src/components/` (other folders) | Lumos's ready-made components, such as `Section`, `Heading` and `Img`. |
 | `src/content/case-studies/` | Your case studies, one folder each. |

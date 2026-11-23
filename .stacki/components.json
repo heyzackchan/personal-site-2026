@@ -85,6 +85,11 @@
     },
     "src/components/wrapper/Section.astro": {
       "props": {}
+    },
+    "src/components/content/HeroHome.astro": {
+      "props": {
+        "heading": "Content goes here"
+      }
     }
   }
 }

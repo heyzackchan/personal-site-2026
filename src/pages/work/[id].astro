@@ -30,16 +30,13 @@ const { caseStudy } = Astro.props;
 const project = caseStudy.data;
 
 // `render` turns the Markdown story under the front matter into something we can place on the page.
-const { Content: Story } = await render(caseStudy);
+const { Content } = await render(caseStudy);
 
 // Images fill the right half on tablets and up, and the full width on phones.
 const imageSizes = "(width >= 48rem) 50vw, 100vw";
 
-const facts = [
-  { label: "Client", value: project.client },
-  { label: "Year", value: project.year },
-  { label: "Work", value: project.disciplines.join(", ") },
-];
+// Written out as one string so it shows as a single field in Stacki.
+const disciplines = project.disciplines.join(", ");
 ---
 <SplitLayout title={project.title} description={project.summary}>
   <Section paddingTop="large" gap="6">
@@ -49,12 +46,18 @@ const facts = [
     </div>
 
     <dl class="flex-horizontal-wrap gap-6 gap-row-3">
-      {facts.map((fact) => (
-        <div>
-          <dt class="text-style-small text-transform-uppercase color-faded">{fact.label}</dt>
-          <dd>{fact.value}</dd>
-        </div>
-      ))}
+      <div>
+        <dt class="text-style-small text-transform-uppercase color-faded">Client</dt>
+        <dd>{project.client}</dd>
+      </div>
+      <div>
+        <dt class="text-style-small text-transform-uppercase color-faded">Year</dt>
+        <dd>{project.year}</dd>
+      </div>
+      <div>
+        <dt class="text-style-small text-transform-uppercase color-faded">Work</dt>
+        <dd>{disciplines}</dd>
+      </div>
     </dl>
 
     <Img
@@ -67,7 +70,7 @@ const facts = [
     />
 
     <RichText maxWidth={60}>
-      <Story />
+      <Content />
     </RichText>
 
     {project.gallery.map((item) => (

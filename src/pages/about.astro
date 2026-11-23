@@ -6,8 +6,6 @@ import SplitLayout from "@/layouts/SplitLayout.astro";
 import Section from "@/components/wrapper/Section.astro";
 import Heading from "@/components/typography/Heading.astro";
 import Paragraph from "@/components/typography/Paragraph.astro";
-
-const email = "hello@example.com";
 ---
 <SplitLayout title="About">
   <Section paddingTop="large" gap="4">
@@ -18,7 +16,7 @@ const email = "hello@example.com";
     </Paragraph>
     <Paragraph variant="large" maxWidth={60}>
       Replace this text with your story, your clients and how to reach you:
-      <a href={`mailto:${email}`}>{email}</a>
+      <a href="mailto:hello@example.com">hello@example.com</a>
     </Paragraph>
   </Section>
 </SplitLayout>

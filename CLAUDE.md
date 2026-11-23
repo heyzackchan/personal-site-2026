@@ -13,7 +13,7 @@ A designer's portfolio built on the Lumos Framework for Astro (no React). The ow
 
 - Use Lumos whenever possible: its components (`Section`, `Heading`, `Paragraph`, `RichText`, `Img`, ...), tokens in `src/styles/base.css`, patterns and utility classes. Docs: https://lumosframework.com/docs/
 - Read `LUMOS.md` before adding pages, components or styles. Its rules apply, with the exceptions below.
-- Our own site-wide components live in `src/components/global/` (LeftPanel, FilterPills, TileGrid, DotText). Helpers live in `src/utils/`.
+- Our own site-wide components live in `src/components/global/` (LeftPanel, FilterPills, TileGrid, DotText). Page content blocks live in `src/components/content/` (HeroHome), named role then variant as Lumos does. Helpers live in `src/utils/`.
 - Files that came from Lumos (`src/components/{form,interactive,item,media,typography,utility,wrapper}`, `global/Nav`, `global/Footer`, `global/NavLink`, `global/SkipLink`, `Button.astro`, `src/utils`, `src/styles/base.css` apart from our tokens, `patterns.css`, `utilities.css`) are library code. Leave them alone unless a change is needed.
 
 ## Our own components
@@ -26,7 +26,7 @@ A designer's portfolio built on the Lumos Framework for Astro (no React). The ow
 
 ## Stacki
 
-The owner edits visually with Stacki. Keep `.stacki/` in the repo, and keep pages simple enough for Stacki to model where possible: a layout wrapping a list of components with props.
+The owner edits visually with Stacki. Keep `.stacki/` in the repo, and keep pages free of `<style>` blocks and complex expressions so Stacki can edit them as a tree: put styles in a component and expose editable text as props. When you add a component, add its default props to `.stacki/components.json`.
 
 ## Where things live
 
